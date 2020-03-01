@@ -1,0 +1,33 @@
+Goal:
+  Find all Candidate Keys
+    Given a set of F of Functional Dependency's (FD) on attributes U
+
+    Algorithm:
+      1. ck := Empty set
+      2. G := DAG of the powerset 2^U of U
+          - Nodes are elements of 2^U (sets of attributes)
+          - There is an edge from X to Y if Y is a subset of X
+      3. Repeat until G is empty:
+          Find a node X without any children
+          if Closure(f)(X) = U
+            ck := ck union {X}
+            delete X and all its ancestors from G
+          else
+            Delete X from G
+Lets use C++ for this project!
+
+Initial problems I see:
+  The DAG could be tricky since we need to delete the ancestors
+    of X
+  Could either use Adjacency List or Matrix list for the graph but I think
+    Adjacency List would be better
+  organizing the FD's could be interesting but could probably make a class
+    for them
+  Problem with 2^U nodes, exponential space for graph of |U| attributes
+
+  Initial thought for milestones:
+    DAG with Adjacency List
+    storing FD's
+    checking if Y is subset of X
+    Closure(f)(X)
+    deletion from DAG
