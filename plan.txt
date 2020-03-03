@@ -31,3 +31,7 @@ Initial problems I see:
     checking if Y is subset of X
     Closure(f)(X)
     deletion from DAG
+
+Need:
+	List - STD:vector
+	linked list - STD:list
