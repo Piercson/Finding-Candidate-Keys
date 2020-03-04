@@ -7,6 +7,7 @@ class Powerset{
   private:
     vector<string>* powerset;
     vector<string>* createPS(string u);
+    bool myfunction(const string& i,const string& j);
     void createPS(vector<char> temp, string u, int n, vector<string>* ps);
   public:
     Powerset(string u);
