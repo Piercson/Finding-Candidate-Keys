@@ -1,11 +1,12 @@
-all: fd
+all: ck
 
-fd: fd_testrunner.o FuncDependency.o
-					g++ -Wall -o fd fd_testrunner.o FuncDependency.o
-fd_testrunner.o: fd_testrunner.cpp FuncDependency.h
-					g++ -Wall -c fd_testrunner.cpp
+ck: Finding_Candidate_Keys.o Powerset.o FuncDependency.o
+					g++ -o ck Finding_Candidate_Keys.o Powerset.o FuncDependency.o
+Finding_Candidate_Keys.o: Finding_Candidate_Keys.cpp
+					g++ -c Finding_Candidate_Keys.cpp
+Powerset.o: Powerset.cpp Powerset.h
+					g++ -c Powerset.cpp
 FuncDependency.o: FuncDependency.cpp FuncDependency.h
 					g++ -c FuncDependency.cpp
-
 clean:
-				rm -rf fd fd.exe *.o *~ *.err *.out
+				rm -rf ck ck.exe *.o *~ *.err *.out

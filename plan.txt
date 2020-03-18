@@ -27,10 +27,11 @@ Initial problems I see:
 
   Initial thought for milestones:
     DAG with Adjacency List
+          deletion from DAG
     storing FD's
     checking if Y is subset of X
     Closure(f)(X)
-    deletion from DAG
+
 
 Need:
 	List - STD:vector

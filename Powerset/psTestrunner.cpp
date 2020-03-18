@@ -5,19 +5,13 @@
 #include "Powerset.h"
 
 using namespace std;
-int cstring_cmp(const void *a, const void *b)
-{
-    const char **ia = (const char **)a;
-    const char **ib = (const char **)b;
-    return strcmp(*ia, *ib);
-	/* strcmp functions works exactly as expected from
-	comparison function */
-}
 int main() {
-  string s = "ABC";
+  string s = "ABCDE";
   Powerset ps = Powerset(s);
+  const std::vector<string>* v;
+  v = ps.getPowerset();
   cout << "Size: " << ps.getSize() << endl;
-  cout << ps << endl;
+  cout << v->at(0) << endl;
 
   return 0;
 }
