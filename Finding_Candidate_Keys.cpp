@@ -9,8 +9,36 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-
-
+bool closure(string att_x, vector<FuncDependency> fd,string set_u){
+  // Add trivial attributs to closure
+  string closure_att = att_x;
+  vector<FuncDependency>::iterator it = fd.begin();
+  // check through all functional dependancy's
+  while( it != fd.end() ){
+    cout << *it << endl;
+    //if the rhs of the fd is in the closure attributes
+    if(closure_att.find(it->getX()) != string::npos){
+      string lhs = it->getY();
+      int size = lhs.size();
+      cout << "LHS is " << lhs << endl;
+      // Add all unique attributes
+      for(int i = 0; i < size; i++){
+        cout << closure_att << " " << lhs.at(i) << endl;
+        if(att_x.find(lhs.at(i)) == string::npos){
+          closure_att += lhs.at(i);
+        }
+      }
+      //remove attribute since we no longer need it for closure
+      fd.erase(it);
+      // restart the search
+      it = fd.begin();
+      continue;
+    }
+    it++;
+  }
+  cout << "closure att " << closure_att  << " Set U " << set_u<< endl;
+  return (set_u.compare(closure_att) == 0);
+}
 int main(){
   // Start with a Given input
   /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
@@ -48,20 +76,25 @@ int main(){
   for(int i = 0; i < ps_size; i++){
     dag[i] = nullptr;
   }
+  // index[0] will be all the power set - 1 since
+  //  powerset[0] is the largest set of all attributes
+  // eg. ABC has subsets A B C AB AC BC
   dag[0] = new list<int>;
   for(int i = 1; i < ps_size; i++){
     dag[0]->push_back(i);
   }
-  cout << "SET UP\n";
+  // Set up the rest of the adj. list
   for(int i = 1; i < ps_size; i++){
     string cur_set = P_SET->at(i);
     int cur_set_size = cur_set.size();
     dag[i] = new list<int>;
     for(int j = setSize[cur_set_size-1]; j < ps_size; j++){
+      // checks jth set in Powerset is a subset of the current set
       if(cur_set.find(P_SET->at(j)) != string::npos && i != j){
         dag[i]->push_back(j);
       }
     }
+    // sets the single attribute set to point to nothing
     if(dag[i]->size() == 0){
       cout << "Delete " << i << endl;
       delete dag[i];
@@ -73,26 +106,16 @@ int main(){
   list<int>::iterator it;
   for(int i = 0; i < ps_size; i++){
         cout << "Set: " << P_SET->at(i) << " contains ";
-    if(dag[i] == nullptr){cout << endl; continue;}
+    if(dag[i] == nullptr){cout << "Empty" << endl; continue;}
     for(it = dag[i]->begin(); it != dag[i]->end(); it++){
       cout << P_SET->at(*it) << " ";
     }
     cout << endl;
   }
-  cout << "nullptr ch:\n";
-  if(dag[30] == nullptr){
-    cout << "tru\n";
-  }
-  // for(int i = 0; i<ps_size;i++){
-  //   cout << dag[i].size() << endl;
-  // }
-  // list<int>::iterator it;
-  // for(it = dag->begin(); it != dag->end(); it++){
-  //   cout << *it << " ";
-  // }
-  //Delete pointers
+  // Clean up
   for(int i = 0; i < ps_size; i++){
     free(dag[i]);
   }
+  closure("AB", dependencys, U_att);
   return 0;
 }
