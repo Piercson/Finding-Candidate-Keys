@@ -8,7 +8,7 @@
 #include "FuncDependency.h"
 #include <bits/stdc++.h>
 using namespace std;
-
+//Finds the closure of att_x with repect to functional dependancies fd
 bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   // Add trivial attributs to closure
   string closure_att = att_x;
@@ -39,11 +39,13 @@ bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   cout << "closure att " << closure_att  << " Set U " << set_u<< endl;
   return (set_u.compare(closure_att) == 0);
 }
+//Finds the node in the graph that is a leaf/sink
 int search(list<int>* graph[], int ps_size){
-  cout << "search\n";
+  // create stack for a "DFS" like search
   vector<int> stack;
   int size = ps_size;
   list<int>::iterator it;
+  //look for a starting place to do the search
   for(int i = 0; i < size; i++){
     if(graph[i] == nullptr){continue;}
     for(it = graph[i]->begin(); it != graph[i]->end(); it++){
@@ -51,10 +53,7 @@ int search(list<int>* graph[], int ps_size){
     }
     break;
   }
-  for(int i = 0; i < stack.size() ;i++){
-    cout << stack[i] << " ";
-  }
-  cout << endl;
+  //start search
   int node;
   while(!stack.empty()){
     node = stack.back();
@@ -68,9 +67,11 @@ int search(list<int>* graph[], int ps_size){
     }
 
   }
-  cout << "Done\n";
+  // if the stack is empty at this point
+  //    the graph has no edges
   return -1;
 }
+
 int main(){
   // Start with a Given input
   /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
