@@ -39,6 +39,38 @@ bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   cout << "closure att " << closure_att  << " Set U " << set_u<< endl;
   return (set_u.compare(closure_att) == 0);
 }
+int search(list<int>* graph[], int ps_size){
+  cout << "search\n";
+  vector<int> stack;
+  int size = ps_size;
+  list<int>::iterator it;
+  for(int i = 0; i < size; i++){
+    if(graph[i] == nullptr){continue;}
+    for(it = graph[i]->begin(); it != graph[i]->end(); it++){
+      stack.push_back(*it);
+    }
+    break;
+  }
+  for(int i = 0; i < stack.size() ;i++){
+    cout << stack[i] << " ";
+  }
+  cout << endl;
+  int node;
+  while(!stack.empty()){
+    node = stack.back();
+    stack.pop_back();
+    if(graph[node] == nullptr){return node;}
+    else{
+      list<int>::iterator it;
+      for(it = graph[node]->begin(); it != graph[node]->end(); it++){
+        stack.push_back(*it);
+      }
+    }
+
+  }
+  cout << "Done\n";
+  return -1;
+}
 int main(){
   // Start with a Given input
   /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
@@ -112,10 +144,22 @@ int main(){
     }
     cout << endl;
   }
+  cout << "begin Search\n";
+  list<int>* dag1[ps_size];
+  for(int i = 0; i < ps_size; i++){
+    dag1[i] = nullptr;
+  }
+  int y = search(dag1, ps_size);
+  if(y == -1){
+    cout << "Empty graph\n";
+  }else{
+    cout << "No Subset: " << P_SET->at(y) << endl;
+  }
+
   // Clean up
   for(int i = 0; i < ps_size; i++){
     free(dag[i]);
   }
-  closure("AB", dependencys, U_att);
+  //closure("AB", dependencys, U_att);
   return 0;
 }
