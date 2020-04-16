@@ -8,7 +8,7 @@
 #include "FuncDependency.h"
 #include <bits/stdc++.h>
 using namespace std;
-// PROBLEM STUFF BECOME EMPTY AND BREAKS THE CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// PROBLEM CLOSURE, POWER SET
 //Finds the closure of att_x with repect to functional dependancies fd
 bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   // Add trivial attributs to closure
@@ -16,12 +16,19 @@ bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   vector<FuncDependency>::iterator it = fd.begin();
   // check through all functional dependancy's
   while( it != fd.end() ){
-    //cout << *it << endl;
     //if the rhs of the fd is in the closure attributes
-    if(closure_att.find(it->getX()) != string::npos){
+    string rhs = it->getX();
+    int rhs_size = rhs.size();
+    bool isSubset = true;
+    for(int i = 0; i < rhs_size; i++){
+      if(closure_att.find(rhs[i]) == string::npos){
+        isSubset = false;
+        break;
+      }
+    }
+    if(isSubset){
       string lhs = it->getY();
       int size = lhs.size();
-      //cout << "LHS is " << lhs << endl;
       // Add all unique attributes
       for(int i = 0; i < size; i++){
         if(att_x.find(lhs.at(i)) == string::npos){
@@ -36,8 +43,17 @@ bool closure(string att_x, vector<FuncDependency> fd,string set_u){
     }
     it++;
   }
-  cout << "closure att " << closure_att  << " Set U " << set_u<< endl;
-  return (set_u.compare(closure_att) == 0);
+  int sum_u = 0;
+  int sum_closure = 0;
+  int u_size = set_u.size();
+  int closure_size = closure_att.size();
+  for(int i = 0; i < u_size; i++){
+    sum_u += (int)set_u[i];
+  }
+  for(int i = 0; i < closure_size; i++){
+    sum_closure += (int)closure_att[i];
+  }
+  return (sum_closure == sum_u);
 }
 //Finds the node in the graph that is a leaf/sink
 // *if there is an issue, try loading stack backwards*
@@ -48,7 +64,7 @@ int search(list<int>* graph[], int ps_size){
   list<int>::iterator it;
   //look for a starting place to do the search
   for(int i = 0; i < size; i++){
-    if(graph[i] == nullptr){continue;}
+    if(graph[i]->empty()){continue;}
     for(it = graph[i]->begin(); it != graph[i]->end(); it++){
       stack.push_back(*it);
     }
@@ -59,7 +75,7 @@ int search(list<int>* graph[], int ps_size){
   while(!stack.empty()){
     node = stack.back();
     stack.pop_back();
-    if(graph[node] == nullptr){return node;}
+    if(graph[node]->empty()){return node;}
     else{
       list<int>::iterator it;
       for(it = graph[node]->begin(); it != graph[node]->end(); it++){
@@ -74,12 +90,15 @@ int search(list<int>* graph[], int ps_size){
 }
 void delete_x_ancestors(list<int>* graph[], int node, int ps_size){
   int size = ps_size;
+  free(graph[node]);
+  graph[node] = new list<int>;
   for(int i = 0; i < size; i++){
     list<int>::iterator it;
-    if(graph[i] == nullptr){continue;}
+    if(graph[i]->empty()){continue;}
     for(it = graph[i]->begin(); it != graph[i]->end(); it++){
       if(*it == node){
-        graph[i] = nullptr;
+        free(graph[i]);
+        graph[i] = new list<int>;
         break;
       }
     }
@@ -87,9 +106,11 @@ void delete_x_ancestors(list<int>* graph[], int node, int ps_size){
 }
 void delete_x(list<int>* graph[], int node, int ps_size){
   int size = ps_size;
+  free(graph[node]);
+  graph[node] = new list<int>;
   for(int i = 0; i < size; i++){
     list<int>::iterator it;
-    if(graph[i] == nullptr){continue;}
+    if(graph[i]->empty()){continue;}
     for(it = graph[i]->begin(); it != graph[i]->end(); it++){
       if(*it == node){
         graph[i]->erase(it);
@@ -102,7 +123,7 @@ bool is_graph_empty(list<int>* graph[], int ps_size){
   int size = ps_size;
   for(int i = 0; i < size; i++){
     list<int>::iterator it;
-    if(graph[i] != nullptr){return false;}
+    if(!graph[i]->empty()){return false;}
     }
     return true;
   }
@@ -113,12 +134,12 @@ int main(){
   */
   int num_FD = 4;
   vector<FuncDependency> dependencys;
-  dependencys.push_back(FuncDependency("AB","C"));
-  dependencys.push_back(FuncDependency("B","D"));
-  dependencys.push_back(FuncDependency("C","E"));
   dependencys.push_back(FuncDependency("D","A"));
+  dependencys.push_back(FuncDependency("F","B"));
+  dependencys.push_back(FuncDependency("DF","E"));
+  dependencys.push_back(FuncDependency("D","C"));
   //create powerset from u_att
-  string U_att = "ABCDE";
+  string U_att = "ABCDEF";
   Powerset set = Powerset(U_att);
   int ps_size = set.getSize();
   const std::vector<string>* P_SET;
@@ -140,9 +161,9 @@ int main(){
   cout << "CREATE\n";
   // create adjacency list
   list<int>* dag[ps_size];
-  for(int i = 0; i < ps_size; i++){
-    dag[i] = nullptr;
-  }
+  // for(int i = 0; i < ps_size; i++){
+  //   dag[i] = nullptr;
+  // }
   // index[0] will be all the power set - 1 since
   //  powerset[0] is the largest set of all attributes
   // eg. ABC has subsets A B C AB AC BC
@@ -157,86 +178,45 @@ int main(){
     dag[i] = new list<int>;
     for(int j = setSize[cur_set_size-1]; j < ps_size; j++){
       // checks jth set in Powerset is a subset of the current set
-      if(cur_set.find(P_SET->at(j)) != string::npos && i != j){
-        dag[i]->push_back(j);
+      string subset = P_SET->at(j);
+      int subset_size = subset.size();
+      bool isSubset = true;
+      if(i == j){continue;}
+      for(int k = 0; k < subset_size; k++){
+        if(cur_set.find(subset[k]) == string::npos){
+          isSubset = false;
+          break;
+        }
       }
+      if(isSubset){dag[i]->push_back(j);}
     }
     // sets the single attribute set to point to nothing
-    if(dag[i]->size() == 0){
-      cout << "Delete " << i << endl;
-      delete dag[i];
-      dag[i] = nullptr;
-    }
   }
   // PRINT
   cout << "ITERATE\n";
   list<int>::iterator it;
   for(int i = 0; i < ps_size; i++){
-        cout << "Set: " << P_SET->at(i) << " contains ";
-    if(dag[i] == nullptr){cout << "Empty" << endl; continue;}
+    if(dag[i]->empty()){continue;}
     for(it = dag[i]->begin(); it != dag[i]->end(); it++){
-      cout << P_SET->at(*it) << " ";
     }
-    cout << endl;
-  }
-  cout << "begin Search\n";
-  list<int>* dag1[ps_size];
-  for(int i = 0; i < ps_size; i++){
-    dag1[i] = nullptr;
-  }
-  int y = search(dag, ps_size);
-  if(y == -1){
-    cout << "Empty graph\n";
-  }else{
-    cout << "No Subset: " << P_SET->at(y) << endl;
-  }
-  //delete_x(dag, y, ps_size);
-  for(int i = 0; i < ps_size; i++){
-        cout << "Set: " << P_SET->at(i) << " contains ";
-    if(dag[i] == nullptr){cout << "Empty" << endl; continue;}
-    for(it = dag[i]->begin(); it != dag[i]->end(); it++){
-      cout << P_SET->at(*it) << " ";
-    }
-    cout << endl;
-  }
-  if(!is_graph_empty(dag1, ps_size)){
-    cout << "not empty\n";
-  }else{
-    cout << "emty\n";
-  }
-  if(closure("AB", dependencys, U_att)){
-    cout << "TURE\n";
   }
   // THE WHOLE THING TOGETHER!
   cout << "START!\n";
   vector<int> can_key;
   while(!is_graph_empty(dag, ps_size)){
     int index = search(dag, ps_size);
-    cout << "index: " << index << endl;
     if(index == -1){break;}
-    cout << "closure of " << P_SET->at(index);
-    bool tf = closure(P_SET->at(index), dependencys, U_att);
-    cout  << " tf: " << tf << endl;
-    if(!tf){
+    if(!closure(P_SET->at(index), dependencys, U_att)){
       delete_x(dag, index, ps_size);
     }else{
       delete_x_ancestors(dag, index, ps_size);
       can_key.push_back(index);
     }
-    cout << "loop\n";
-    for(int i = 0; i < ps_size; i++){
-          cout << "Set: " << P_SET->at(i) << " contains ";
-      if(dag[i] == nullptr){cout << "Empty" << endl; continue;}
-      for(it = dag[i]->begin(); it != dag[i]->end(); it++){
-        cout << P_SET->at(*it) << " ";
-      }
-      cout << endl;
-    }
   }
   int c_size = can_key.size();
   cout << "Candidate Key: ";
   for(int i = 0; i < c_size; i++){
-    cout << P_SET->at(i) << " ";
+    cout << P_SET->at(can_key[i]) << " ";
   }
   cout << endl;
   // Clean up
