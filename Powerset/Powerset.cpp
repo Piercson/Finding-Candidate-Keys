@@ -5,23 +5,23 @@
 #include <typeinfo>
 using namespace std;
 
-Powerset::Powerset(string u){
+Powerset::Powerset(vector<string> u){
   powerset = createPS(u);
 }
-bool Powerset::myfunction(const string& i,const string& j){
-  cout << i << " " << j << endl;
-  return i.size() < j.size();
-}
+// bool Powerset::myfunction(const vector<vector<string>>& i,const vector<vector<string>>& j){
+//   cout << i << " " << j << endl;
+//   return i.size() < j.size();
+// }
 struct Compare {
-  bool operator() (string i,string j) {
+  bool operator() (vector<string> i,vector<string> j) {
      return (i.size()>j.size());
    }
 } comp;
-vector<string>* Powerset::createPS(string u){
+vector<vector<string>>* Powerset::createPS(vector<string> u){
   int size = u.size();
-  vector<char> t;
-  vector<string>* ps;
-  ps = new vector<string>;
+  vector<string> t;
+  vector<vector<string>>* ps;
+  ps = new vector<vector<string>>;
   createPS(t,u,size,ps);
   ps->pop_back(); // the last set is the empty set
   sort(ps->begin(), ps->end(), comp); // decreasing order based on string size
@@ -31,14 +31,9 @@ vector<string>* Powerset::createPS(string u){
   Creates a powerset by either including the n-1 element or no include
   this will find 2^n sets including the empty set
 */
-void Powerset::createPS(vector<char> temp, string u, int n, vector<string>* ps){
+void Powerset::createPS(vector<string> temp, vector<string> u, int n, vector<vector<string>>* ps){
   if(n == 0){
-    int size = temp.size();
-    string s = "";
-    for(int i = 0; i < size; i++){
-      s += temp[i];
-    }
-    ps->push_back(s);
+    ps->push_back(temp);
     return;
   }
   //include
@@ -51,7 +46,12 @@ void Powerset::createPS(vector<char> temp, string u, int n, vector<string>* ps){
 ostream& operator <<(ostream& os, const Powerset& ps){
   int size = ps.powerset->size();
   for(int i = 0; i < size; i++){
-    os << "(" << ps.powerset->at(i) << ") ";
+    int j_size = ps.powerset->at(i).size();
+    cout << "(";
+    for(int j = 0; j < j_size; j++){
+      os << ps.powerset->at(i)[j] << " ";
+    }
+    cout << ")" <<endl;
   }
   return os;
 }
