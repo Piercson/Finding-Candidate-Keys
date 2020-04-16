@@ -1,15 +1,15 @@
 // Want form X determines Y
 #pragma once
-
+#include <vector>
 #include <string>
 using namespace std;
 class FuncDependency{
   private:
-    string x;
-    string y;
+    vector<string> x;
+    vector<string> y;
   public:
-    FuncDependency(string x, string y);
-    string getX();
-    string getY();
+    FuncDependency(vector<string> x, vector<string> y);
+    vector<string> getX();
+    vector<string> getY();
     friend ostream& operator <<(ostream& os, const FuncDependency& fd);
 };

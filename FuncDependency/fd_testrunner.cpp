@@ -5,9 +5,12 @@
 
 using namespace std;
 int main() {
-  string words1 = "C";
-  string words2 = "AB";
+  vector<string> words1;
+  words1.push_back("C");
+  vector<string> words2;
+  words2.push_back("A");
+  words2.push_back("B");
   FuncDependency fd = FuncDependency(words1,words2);
-  cout << fd;
+  cout << fd << endl;
   return 0;
 }
