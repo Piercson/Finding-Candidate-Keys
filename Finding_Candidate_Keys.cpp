@@ -8,6 +8,7 @@
 #include "FuncDependency.h"
 #include <bits/stdc++.h>
 using namespace std;
+// PROBLEM STUFF BECOME EMPTY AND BREAKS THE CODE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //Finds the closure of att_x with repect to functional dependancies fd
 bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   // Add trivial attributs to closure
@@ -15,15 +16,14 @@ bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   vector<FuncDependency>::iterator it = fd.begin();
   // check through all functional dependancy's
   while( it != fd.end() ){
-    cout << *it << endl;
+    //cout << *it << endl;
     //if the rhs of the fd is in the closure attributes
     if(closure_att.find(it->getX()) != string::npos){
       string lhs = it->getY();
       int size = lhs.size();
-      cout << "LHS is " << lhs << endl;
+      //cout << "LHS is " << lhs << endl;
       // Add all unique attributes
       for(int i = 0; i < size; i++){
-        cout << closure_att << " " << lhs.at(i) << endl;
         if(att_x.find(lhs.at(i)) == string::npos){
           closure_att += lhs.at(i);
         }
@@ -40,6 +40,7 @@ bool closure(string att_x, vector<FuncDependency> fd,string set_u){
   return (set_u.compare(closure_att) == 0);
 }
 //Finds the node in the graph that is a leaf/sink
+// *if there is an issue, try loading stack backwards*
 int search(list<int>* graph[], int ps_size){
   // create stack for a "DFS" like search
   vector<int> stack;
@@ -71,7 +72,40 @@ int search(list<int>* graph[], int ps_size){
   //    the graph has no edges
   return -1;
 }
-
+void delete_x_ancestors(list<int>* graph[], int node, int ps_size){
+  int size = ps_size;
+  for(int i = 0; i < size; i++){
+    list<int>::iterator it;
+    if(graph[i] == nullptr){continue;}
+    for(it = graph[i]->begin(); it != graph[i]->end(); it++){
+      if(*it == node){
+        graph[i] = nullptr;
+        break;
+      }
+    }
+  }
+}
+void delete_x(list<int>* graph[], int node, int ps_size){
+  int size = ps_size;
+  for(int i = 0; i < size; i++){
+    list<int>::iterator it;
+    if(graph[i] == nullptr){continue;}
+    for(it = graph[i]->begin(); it != graph[i]->end(); it++){
+      if(*it == node){
+        graph[i]->erase(it);
+        break;
+      }
+    }
+  }
+}
+bool is_graph_empty(list<int>* graph[], int ps_size){
+  int size = ps_size;
+  for(int i = 0; i < size; i++){
+    list<int>::iterator it;
+    if(graph[i] != nullptr){return false;}
+    }
+    return true;
+  }
 int main(){
   // Start with a Given input
   /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
@@ -150,13 +184,61 @@ int main(){
   for(int i = 0; i < ps_size; i++){
     dag1[i] = nullptr;
   }
-  int y = search(dag1, ps_size);
+  int y = search(dag, ps_size);
   if(y == -1){
     cout << "Empty graph\n";
   }else{
     cout << "No Subset: " << P_SET->at(y) << endl;
   }
-
+  //delete_x(dag, y, ps_size);
+  for(int i = 0; i < ps_size; i++){
+        cout << "Set: " << P_SET->at(i) << " contains ";
+    if(dag[i] == nullptr){cout << "Empty" << endl; continue;}
+    for(it = dag[i]->begin(); it != dag[i]->end(); it++){
+      cout << P_SET->at(*it) << " ";
+    }
+    cout << endl;
+  }
+  if(!is_graph_empty(dag1, ps_size)){
+    cout << "not empty\n";
+  }else{
+    cout << "emty\n";
+  }
+  if(closure("AB", dependencys, U_att)){
+    cout << "TURE\n";
+  }
+  // THE WHOLE THING TOGETHER!
+  cout << "START!\n";
+  vector<int> can_key;
+  while(!is_graph_empty(dag, ps_size)){
+    int index = search(dag, ps_size);
+    cout << "index: " << index << endl;
+    if(index == -1){break;}
+    cout << "closure of " << P_SET->at(index);
+    bool tf = closure(P_SET->at(index), dependencys, U_att);
+    cout  << " tf: " << tf << endl;
+    if(!tf){
+      delete_x(dag, index, ps_size);
+    }else{
+      delete_x_ancestors(dag, index, ps_size);
+      can_key.push_back(index);
+    }
+    cout << "loop\n";
+    for(int i = 0; i < ps_size; i++){
+          cout << "Set: " << P_SET->at(i) << " contains ";
+      if(dag[i] == nullptr){cout << "Empty" << endl; continue;}
+      for(it = dag[i]->begin(); it != dag[i]->end(); it++){
+        cout << P_SET->at(*it) << " ";
+      }
+      cout << endl;
+    }
+  }
+  int c_size = can_key.size();
+  cout << "Candidate Key: ";
+  for(int i = 0; i < c_size; i++){
+    cout << P_SET->at(i) << " ";
+  }
+  cout << endl;
   // Clean up
   for(int i = 0; i < ps_size; i++){
     free(dag[i]);
