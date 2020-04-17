@@ -1,14 +1,14 @@
 #include <iostream>
 #include "FuncDependency.h"
 using namespace std;
-FuncDependency::FuncDependency(string x, string y){
+FuncDependency::FuncDependency(vector<string> x, vector<string> y){
   this->x = x;
   this->y = y;
 }
-string FuncDependency::getX(){
+vector<string> FuncDependency::getX(){
   return this->x;
 }
-string FuncDependency::getY(){
+vector<string> FuncDependency::getY(){
   return this->y;
 }
 ostream& operator <<(ostream& os, const FuncDependency& fd){

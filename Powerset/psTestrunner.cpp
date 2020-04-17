@@ -7,16 +7,16 @@
 using namespace std;
 int main() {
   vector<string> s;
-  s.push_back("A");
-  s.push_back("B");
-  s.push_back("C");
-  s.push_back("D");
-  s.push_back("E");
+  s.push_back("Title");
+  s.push_back("Actor");
+  s.push_back("Release");
+  s.push_back("Theater");
+  s.push_back("Time");
 
   Powerset ps = Powerset(s);
   const std::vector<vector<string>>* v;
   v = ps.getPowerset();
-  cout << "Size: " << ps.getSize() << endl;
+  cout << "Size: " << v->size() << endl;
   cout << ps << endl;
 
   return 0;

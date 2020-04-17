@@ -5,13 +5,13 @@
 using namespace std;
 class Powerset{
   private:
-    vector<string>* powerset;
-    vector<string>* createPS(string u);
-    bool myfunction(const string& i,const string& j);
-    void createPS(vector<char> temp, string u, int n, vector<string>* ps);
+    vector<vector<string>>* powerset;
+    vector<vector<string>>* createPS(vector<string> u);
+    //bool myfunction(const vector<string>& i,const vector<string>& j);
+    void createPS(vector<string> temp, vector<string> u, int n, vector<vector<string>>* ps);
   public:
-    Powerset(string u);
+    Powerset(vector<string> u);
     friend ostream& operator <<(ostream& os, const Powerset& ps);
     int getSize() { return powerset->size(); };
-    const vector<string>* getPowerset(){ return powerset; }
+    vector<vector<string>>* getPowerset(){ return powerset; }
 };

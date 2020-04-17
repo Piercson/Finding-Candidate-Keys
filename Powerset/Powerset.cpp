@@ -33,6 +33,7 @@ vector<vector<string>>* Powerset::createPS(vector<string> u){
 */
 void Powerset::createPS(vector<string> temp, vector<string> u, int n, vector<vector<string>>* ps){
   if(n == 0){
+    
     ps->push_back(temp);
     return;
   }
