@@ -159,7 +159,7 @@ vector<FuncDependency> preset_fd(){
   return dependencys;
 }
 vector<string> input_att(){
-  cout << "Please input unique attributes\n";
+  cout << "Please input unique attributes From your Table\n";
   vector<string> att;
   string inp;
   while(1){
@@ -183,7 +183,50 @@ vector<string> input_att(){
   return att;
 }
 vector<FuncDependency> input_fd(){
-
+  vector<FuncDependency> fd;
+  cout << "Enter Functional Dependencies using Attribues From your Table"
+  while(1){
+    string inp;
+    cout << "Enter Functional Dependencies\nEnter ; to Finish\nFormat[rhs,rhs,..;lhs,lhs,..]\n>> ";
+    cin >> inp;
+    if(inp[0] == ';'){
+      break;
+    }
+    int size = inp.size();
+    vector<string> rhs;
+    vector<string> lhs;
+    string str = "";
+    int i;
+    for(i = 0; i < size; i++){
+      if(inp[i] == ','){
+        rhs.push_back(str);
+        str = "";
+      }else if(inp[i] == ';'){
+        rhs.push_back(str);
+        str = "";
+        break;
+      }else{
+        str += inp[i];
+      }
+    } // for
+    // move past ;
+    for(i = i + 1; i < size; i++){
+      if(inp[i] == ','){
+        lhs.push_back(str);
+        str = "";
+      }else{
+        str += inp[i];
+      }
+    }// for
+    lhs.push_back(str);
+    fd.push_back(FuncDependency(rhs,lhs));
+  }//while
+  cout << "Print lhs\n";
+  vector<FuncDependency>::iterator it;
+  for(it = fd.begin(); it != fd.end(); it++){
+    cout << *it << endl;
+  }
+  return fd;
 }
 int main(){
   // Start with a Given input
@@ -203,8 +246,7 @@ int main(){
     switch(input){
       case '1':
         U_att = input_att();
-        return 0;
-        dependencys = preset_fd();
+        dependencys = input_fd();
         break;
       case '2':
         U_att = preset_att();
