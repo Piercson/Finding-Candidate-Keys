@@ -158,6 +158,33 @@ vector<FuncDependency> preset_fd(){
   dependencys.push_back(FuncDependency(rhs,lhs));
   return dependencys;
 }
+vector<string> input_att(){
+  cout << "Please input unique attributes\n";
+  vector<string> att;
+  string inp;
+  while(1){
+    cout << "Enter attribute\nEnter ; to Finish\n>> ";
+    cin >> inp;
+    if(inp[0] == ';'){
+      if(att.empty()){
+        cout << "No attributes";
+        continue;
+      }else{
+        break;
+      }
+    }
+    att.push_back(inp);
+  }
+  cout << "Attribute are:\n";
+  vector<string>::iterator it;
+  for(it = att.begin(); it != att.end(); it++){
+    cout << *it << endl;
+  }
+  return att;
+}
+vector<FuncDependency> input_fd(){
+
+}
 int main(){
   // Start with a Given input
   /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
@@ -175,7 +202,8 @@ int main(){
     cin >> input;
     switch(input){
       case '1':
-        U_att = preset_att();
+        U_att = input_att();
+        return 0;
         dependencys = preset_fd();
         break;
       case '2':
@@ -258,6 +286,6 @@ int main(){
     for(int i = 0; i < ps_size; i++){
       free(dag[i]);
     }
-  }
+  }// WHILE
   return 0;
 }
