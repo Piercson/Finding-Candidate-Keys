@@ -58,7 +58,7 @@ int search(list<long>* graph[], long ps_size){
   vector<long> stack;
   list<long>::iterator it;
   //look for a starting place to do the search
-  for(long i = 0; i < ps_size; i++){
+  for(long i = ps_size - 1; i >= 0; i--){
     if(graph[i]->empty()){continue;}
     for(it = graph[i]->begin(); it != graph[i]->end(); it++){
       stack.push_back(*it);
@@ -184,7 +184,7 @@ vector<string> input_att(){
 }
 vector<FuncDependency> input_fd(){
   vector<FuncDependency> fd;
-  cout << "Enter Functional Dependencies using Attribues From your Table"
+  cout << "Enter Functional Dependencies using Attribues From your Table\n";
   while(1){
     string inp;
     cout << "Enter Functional Dependencies\nEnter ; to Finish\nFormat[rhs,rhs,..;lhs,lhs,..]\n>> ";
@@ -221,7 +221,7 @@ vector<FuncDependency> input_fd(){
     lhs.push_back(str);
     fd.push_back(FuncDependency(rhs,lhs));
   }//while
-  cout << "Print lhs\n";
+  cout << "Printing Functional Dependencies\n";
   vector<FuncDependency>::iterator it;
   for(it = fd.begin(); it != fd.end(); it++){
     cout << *it << endl;
@@ -233,14 +233,14 @@ int main(){
   /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
       Candidate Key = B
   */
-  cout << "This program finds the set of attributes that are in the candidate key\n";
-  cout << "[1]: Input a set of attributes along with dependancies\n";
-  cout << "[2]: A preset input\n";
-  cout << "[3]: Exit\n";
   char input;
   vector<string> U_att;
   vector<FuncDependency> dependencys;
   while(input != '3'){
+    cout << "This program finds the set of attributes that are in the candidate key\n";
+    cout << "[1]: Input a set of attributes along with dependancies\n";
+    cout << "[2]: A preset input\n";
+    cout << "[3]: Exit\n";
     cout << "Select an option >> ";
     cin >> input;
     switch(input){
@@ -257,6 +257,8 @@ int main(){
       default:
         continue;
     }
+    //Start!
+    cout << "Finding Candidate Keys...\n";
     Powerset set = Powerset(U_att);
     long ps_size = set.getSize();
     vector<vector<string>>* P_SET;
