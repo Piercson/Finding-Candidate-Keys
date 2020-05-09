@@ -58,7 +58,7 @@ int search(list<long>* graph[], long ps_size){
   vector<long> stack;
   list<long>::iterator it;
   //look for a starting place to do the search
-  for(long i = ps_size - 1; i >= 0; i--){
+  for(long i = 0; i < ps_size; i++){
     if(graph[i]->empty()){continue;}
     for(it = graph[i]->begin(); it != graph[i]->end(); it++){
       stack.push_back(*it);
@@ -126,39 +126,41 @@ vector<string> preset_att(){
   U_att.push_back("C");
   U_att.push_back("D");
   U_att.push_back("E");
-  U_att.push_back("F");
+  cout << "Attributes\n";
+  print(U_att);
+  cout << endl;
   return U_att;
 }
 vector<FuncDependency> preset_fd(){
   vector<FuncDependency> dependencys;
   vector<string> rhs;
   vector<string> lhs;
-  rhs.push_back("D");
-  lhs.push_back("A");
-  dependencys.push_back(FuncDependency(rhs,lhs));
-  rhs.pop_back();
-  lhs.pop_back();
-
-  rhs.push_back("F");
-  lhs.push_back("B");
-  dependencys.push_back(FuncDependency(rhs,lhs));
-  rhs.pop_back();
-  lhs.pop_back();
-
-  rhs.push_back("F");
-  rhs.push_back("D");
-  lhs.push_back("E");
-  dependencys.push_back(FuncDependency(rhs,lhs));
-  rhs.pop_back();
-  rhs.pop_back();
-  lhs.pop_back();
-
-  rhs.push_back("D");
+  rhs.push_back("A");
   lhs.push_back("C");
   dependencys.push_back(FuncDependency(rhs,lhs));
+  rhs.pop_back();
+  lhs.pop_back();
+
+  rhs.push_back("E");
+  lhs.push_back("D");
+  dependencys.push_back(FuncDependency(rhs,lhs));
+  rhs.pop_back();
+  lhs.pop_back();
+
+  rhs.push_back("B");
+  lhs.push_back("C");
+  dependencys.push_back(FuncDependency(rhs,lhs));
+  rhs.pop_back();
+  lhs.pop_back();
+  cout << "Functional Dependencies\n";
+  print(dependencys);
+  cout << endl;
   return dependencys;
 }
 vector<string> input_att(){
+  // the input for the Attributes
+  // attributes are inputted one at a time
+  // ; is chosen to stop input because ; is illegal for attribute names
   cout << "Please input unique attributes From your Table\n";
   vector<string> att;
   string inp;
@@ -183,6 +185,11 @@ vector<string> input_att(){
   return att;
 }
 vector<FuncDependency> input_fd(){
+  // input for the functional dependancies
+  // , and ; are not allowed in attribute names so they are used to break up the string
+  // , are equavilaent to 'and' ex. Title and Date -> Title,Date
+  // ; are equavilaent to 'determines' ex. Theater Determines Time -> Theater;Time
+  // a ; at the start of the input indicates finishing entering functional dependencies
   vector<FuncDependency> fd;
   cout << "Enter Functional Dependencies using Attribues From your Table\n";
   while(1){
@@ -230,9 +237,6 @@ vector<FuncDependency> input_fd(){
 }
 int main(){
   // Start with a Given input
-  /*  R(ABCDE)   Sigma = {AB-:C, B-:D, C-:E, D-:A}
-      Candidate Key = B
-  */
   char input;
   vector<string> U_att;
   vector<FuncDependency> dependencys;
@@ -320,16 +324,21 @@ int main(){
         can_key.push_back(index);
       }
     }
+    // Print Candidate key
     int c_size = can_key.size();
+    cout << "Size: " << c_size << endl;
     cout << "Candidate Key: ";
     for(int i = 0; i < c_size; i++){
+      cout << "{";
       print(P_SET->at(can_key[i]));
+      cout << "}";
     }
     cout << endl;
     // Clean up
     for(int i = 0; i < ps_size; i++){
       free(dag[i]);
     }
+    free(dag);
   }// WHILE
   return 0;
 }
