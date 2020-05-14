@@ -224,6 +224,77 @@ vector<FuncDependency> input_fd(){
   }
   return fd;
 }
+vector<vector<string>> find_candidate_key(vector<string> U_att, vector<FuncDependency> dependencys){
+  cout << "Finding Candidate Keys...\n";
+  Powerset set = Powerset(U_att);
+  long ps_size = set.getSize();
+  vector<vector<string>>* P_SET;
+  P_SET = set.getPowerset();
+  // The powerset is organized from larger set at [0]
+  //  to smaller sets [2^U]
+  int amt_att = U_att.size();
+  // setSize[0] translates to set size of 1 is from ps_size - setSize[0]
+  // setSize[1] translates tp set size of 2 is from setSize[0] - setSize[1]
+  long setSize[amt_att];
+  long setSize_i = 0;
+  long cur_set_size = P_SET->at(ps_size-1).size();
+  for(long i = ps_size-1; i >= 0; i--){
+    if(P_SET->at(i).size() != cur_set_size){
+      setSize[setSize_i++] = i + 1;
+      cur_set_size = P_SET->at(i).size();
+    }
+  }
+  setSize[amt_att-1] = 0;
+  // create adjacency list
+  list<long>* dag[ps_size];
+  // index[0] will be all the power set - 1 since
+  //  powerset[0] is the largest set of all attributes
+  // eg. ABC has subsets A B C AB AC BC
+  dag[0] = new list<long>;
+  for(long i = 1; i < ps_size; i++){
+    dag[0]->push_back(i);
+  }
+  // Set up the rest of the adj. list
+  for(long i = 0; i < ps_size; i++){
+    vector<string> cur_set = P_SET->at(i);
+    long cur_set_size = cur_set.size();
+    dag[i] = new list<long>;
+    //cout << "i: " << i << endl;
+    for(long j = setSize[cur_set_size-1]; j < ps_size; j++){
+      //cout << "j: " << j << endl;
+      vector<string> subset = P_SET->at(j);
+      int subset_size = subset.size();
+      bool isSubset = true;
+      if(i == j){continue;}
+      for(int k = 0; k < subset_size; k++){
+        if(std::find(cur_set.begin(), cur_set.end(), subset[k]) == cur_set.end()){
+          isSubset = false;
+          break;
+        }
+      }
+      if(isSubset){dag[i]->push_back(j);}
+    }
+  }
+  // THE WHOLE THING TOGETHER!
+  vector<vector<string>> can_key;
+  while(!is_graph_empty(dag, ps_size)){
+    long index = search(dag, ps_size);
+    if(index == -1){break;}
+    if(!closure(P_SET->at(index), dependencys, U_att)){
+      delete_x(dag, index, ps_size);
+    }else{
+      delete_x_ancestors(dag, index, ps_size);
+      can_key.push_back(P_SET->at(index));
+    }
+  }
+  cout << endl;
+  // Clean up
+  for(int i = 0; i < ps_size; i++){
+    free(dag[i]);
+  }
+  free(dag);
+  return can_key;
+}
 int main(){
   // Start with a Given input
   char input;
@@ -251,83 +322,17 @@ int main(){
         continue;
     }
     //Start!
-    cout << "Finding Candidate Keys...\n";
-    Powerset set = Powerset(U_att);
-    long ps_size = set.getSize();
-    vector<vector<string>>* P_SET;
-    P_SET = set.getPowerset();
-    // The powerset is organized from larger set at [0]
-    //  to smaller sets [2^U]
-    int amt_att = U_att.size();
-    // setSize[0] translates to set size of 1 is from ps_size - setSize[0]
-    // setSize[1] translates tp set size of 2 is from setSize[0] - setSize[1]
-    long setSize[amt_att];
-    long setSize_i = 0;
-    long cur_set_size = P_SET->at(ps_size-1).size();
-    for(long i = ps_size-1; i >= 0; i--){
-      if(P_SET->at(i).size() != cur_set_size){
-        setSize[setSize_i++] = i + 1;
-        cur_set_size = P_SET->at(i).size();
-      }
-    }
-    setSize[amt_att-1] = 0;
-    // create adjacency list
-    list<long>* dag[ps_size];
-    // index[0] will be all the power set - 1 since
-    //  powerset[0] is the largest set of all attributes
-    // eg. ABC has subsets A B C AB AC BC
-    dag[0] = new list<long>;
-    for(long i = 1; i < ps_size; i++){
-      dag[0]->push_back(i);
-    }
-    // Set up the rest of the adj. list
-    for(long i = 0; i < ps_size; i++){
-      vector<string> cur_set = P_SET->at(i);
-      long cur_set_size = cur_set.size();
-      dag[i] = new list<long>;
-      //cout << "i: " << i << endl;
-      for(long j = setSize[cur_set_size-1]; j < ps_size; j++){
-        //cout << "j: " << j << endl;
-        vector<string> subset = P_SET->at(j);
-        int subset_size = subset.size();
-        bool isSubset = true;
-        if(i == j){continue;}
-        for(int k = 0; k < subset_size; k++){
-          if(std::find(cur_set.begin(), cur_set.end(), subset[k]) == cur_set.end()){
-            isSubset = false;
-            break;
-          }
-        }
-        if(isSubset){dag[i]->push_back(j);}
-      }
-    }
-    // THE WHOLE THING TOGETHER!
-    vector<long> can_key;
-    while(!is_graph_empty(dag, ps_size)){
-      long index = search(dag, ps_size);
-      if(index == -1){break;}
-      if(!closure(P_SET->at(index), dependencys, U_att)){
-        delete_x(dag, index, ps_size);
-      }else{
-        delete_x_ancestors(dag, index, ps_size);
-        can_key.push_back(index);
-      }
-    }
     // Print Candidate key
+    vector<vector<string>> can_key = find_candidate_key(U_att, dependencys);
     int c_size = can_key.size();
     cout << "Size: " << c_size << endl;
     cout << "Candidate Key: ";
     for(int i = 0; i < c_size; i++){
       cout << "{";
-      print(P_SET->at(can_key[i]));
+      print(can_key[i]);
       cout << "}";
     }
     cout << endl;
-    // Clean up
-    for(int i = 0; i < ps_size; i++){
-      free(dag[i]);
-    }
-    free(dag);
   }// WHILE
   return 0;
 }
