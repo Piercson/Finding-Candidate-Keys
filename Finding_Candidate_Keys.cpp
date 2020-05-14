@@ -8,6 +8,7 @@
 #include "FuncDependency.h"
 #include <bits/stdc++.h>
 using namespace std;
+FuncDependency returnFD(string);
 //Print for vectors<T>
 template <class T>
 void print(vector<T> list){
@@ -133,25 +134,9 @@ vector<string> preset_att(){
 }
 vector<FuncDependency> preset_fd(){
   vector<FuncDependency> dependencys;
-  vector<string> rhs;
-  vector<string> lhs;
-  rhs.push_back("A");
-  lhs.push_back("C");
-  dependencys.push_back(FuncDependency(rhs,lhs));
-  rhs.pop_back();
-  lhs.pop_back();
-
-  rhs.push_back("E");
-  lhs.push_back("D");
-  dependencys.push_back(FuncDependency(rhs,lhs));
-  rhs.pop_back();
-  lhs.pop_back();
-
-  rhs.push_back("B");
-  lhs.push_back("C");
-  dependencys.push_back(FuncDependency(rhs,lhs));
-  rhs.pop_back();
-  lhs.pop_back();
+  dependencys.push_back(returnFD("A;C"));
+  dependencys.push_back(returnFD("E;D"));
+  dependencys.push_back(returnFD("B;C"));
   cout << "Functional Dependencies\n";
   print(dependencys);
   cout << endl;
@@ -184,6 +169,36 @@ vector<string> input_att(){
   }
   return att;
 }
+FuncDependency returnFD(string inp){
+  int size = inp.size();
+  vector<string> rhs;
+  vector<string> lhs;
+  string str = "";
+  int i;
+  for(i = 0; i < size; i++){
+    if(inp[i] == ','){
+      rhs.push_back(str);
+      str = "";
+    }else if(inp[i] == ';'){
+      rhs.push_back(str);
+      str = "";
+      break;
+    }else{
+      str += inp[i];
+    }
+  } // for
+  for(i = i + 1; i < size; i++){
+    if(inp[i] == ','){
+      lhs.push_back(str);
+      str = "";
+    }else{
+      str += inp[i];
+    }
+  }// for
+  lhs.push_back(str);
+  return FuncDependency(rhs,lhs);
+
+}
 vector<FuncDependency> input_fd(){
   // input for the functional dependancies
   // , and ; are not allowed in attribute names so they are used to break up the string
@@ -199,34 +214,8 @@ vector<FuncDependency> input_fd(){
     if(inp[0] == ';'){
       break;
     }
-    int size = inp.size();
-    vector<string> rhs;
-    vector<string> lhs;
-    string str = "";
-    int i;
-    for(i = 0; i < size; i++){
-      if(inp[i] == ','){
-        rhs.push_back(str);
-        str = "";
-      }else if(inp[i] == ';'){
-        rhs.push_back(str);
-        str = "";
-        break;
-      }else{
-        str += inp[i];
-      }
-    } // for
-    // move past ;
-    for(i = i + 1; i < size; i++){
-      if(inp[i] == ','){
-        lhs.push_back(str);
-        str = "";
-      }else{
-        str += inp[i];
-      }
-    }// for
-    lhs.push_back(str);
-    fd.push_back(FuncDependency(rhs,lhs));
+    //------------
+    fd.push_back(returnFD(inp));
   }//while
   cout << "Printing Functional Dependencies\n";
   vector<FuncDependency>::iterator it;
